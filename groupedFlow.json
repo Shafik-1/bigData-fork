@@ -20,14 +20,13 @@
           "x": -624.0,
           "y": -48.0
         },
-        "type": "org.apache.nifi.kafka.processors.ConsumeKafka",
+        "type": "org.apache.nifi.processors.kafka.pubsub.ConsumeKafka_2_6",
         "bundle": {
           "group": "org.apache.nifi",
-          "artifact": "nifi-kafka-nar",
+          "artifact": "nifi-kafka-2-6-nar",
           "version": "1.28.0"
         },
         "properties": {
-          "Topics": "airplane_crashes_raw",
           "Commit Offsets": "true",
           "Header Name Pattern": null,
           "Key Format": "byte-array",
@@ -39,13 +38,14 @@
           "Topic Format": "names",
           "Header Encoding": "UTF-8",
           "Max Uncommitted Time": "100 millis",
-          "Kafka Connection Service": "1537e66e-cb7d-3ab1-87e6-b46bbe870d80",
           "Separate By Key": "false",
           "Processing Strategy": "FLOW_FILE",
           "Record Writer": null,
-          "Group ID": "Nificonsumer",
           "auto.offset.reset": "earliest",
-          "Output Strategy": "USE_VALUE"
+          "Output Strategy": "USE_VALUE",
+          "bootstrap.servers": "localhost:9092",
+          "topic": "airplane_crashes_raw",
+          "group.id": "Nificonsumer"
         },
         "propertyDescriptors": {
           "Topics": {
@@ -545,10 +545,10 @@
           "x": -176.0,
           "y": 96.0
         },
-        "type": "org.apache.nifi.kafka.processors.PublishKafka",
+        "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
         "bundle": {
           "group": "org.apache.nifi",
-          "artifact": "nifi-kafka-nar",
+          "artifact": "nifi-kafka-2-6-nar",
           "version": "1.28.0"
         },
         "properties": {
@@ -561,10 +561,8 @@
           "Transactional ID Prefix": null,
           "Header Encoding": "UTF-8",
           "max.request.size": "1 MB",
-          "Topic Name": "produceToSpark",
           "Kafka Key": null,
           "partition": null,
-          "Kafka Connection Service": "1537e66e-cb7d-3ab1-87e6-b46bbe870d80",
           "Publish Strategy": "USE_VALUE",
           "Record Key Writer": null,
           "Failure Strategy": "Route to Failure",
@@ -572,7 +570,9 @@
           "Record Writer": "2060b6f6-862f-3a88-848c-d4bbb81150b9",
           "Transactions Enabled": "false",
           "Message Key Field": null,
-          "FlowFile Attribute Header Pattern": null
+          "FlowFile Attribute Header Pattern": null,
+          "bootstrap.servers": "localhost:9092",
+          "topic": "produceToSpark"
         },
         "propertyDescriptors": {
           "compression.type": {

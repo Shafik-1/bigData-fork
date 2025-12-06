@@ -54,41 +54,31 @@ The data flows through the system in three main stages:
 - **Kafka**: Downloaded and extracted.
 - **NiFi**: Downloaded and extracted.
 
-### Step 1: Start Services
+### Step 1: Run Everything
 
-We have created a helper script to start Zookeeper, Kafka, and NiFi for you.
+We have restored the `runAll.py` script to make it easy.
 
 ```bash
-python3 runLocal.py
+python3 runAll.py
 ```
 
-_Wait a few minutes for NiFi to start fully._
+This script will:
 
-### Step 2: Import the Flow
+1.  Start PostgreSQL, Zookeeper, Kafka, and NiFi.
+2.  Launch `SparkAnalytics.py` and `KafkaProducer.py` in new terminal windows.
+
+_Note: If NiFi is not running yet, wait for it to start before the data flows._
+
+### Step 2: Import the Flow (One Time Setup)
 
 1.  Open NiFi at [https://localhost:8443/nifi](https://localhost:8443/nifi).
-2.  Login with the credentials generated in your logs (or `admin` / `admin123456789` if you reset them).
-3.  Drag a **Process Group** to the canvas.
-4.  Click the **Browse** (folder icon) and select `groupedFlow.json`.
-5.  Click **Add**.
-6.  **Double-click** the new group to enter it.
-7.  Right-click on the canvas background and select **Start**.
-
-### Step 3: Run the Pipeline
-
-Open two new terminal windows:
-
-**Terminal 1 (Analytics Consumer):**
-
-```bash
-python3 SparkAnalytics.py
-```
-
-**Terminal 2 (Data Producer):**
-
-```bash
-python3 KafkaProducer.py
-```
+2.  Login.
+3.  **Import** `groupedFlow.json`.
+4.  **Enable Controller Services**:
+    - Right-click the Process Group -> **Configure**.
+    - Go to **Controller Services** tab.
+    - Enable `JsonTreeReader` and `JsonRecordSetWriter` (click the lightning bolt icon).
+5.  **Start** the Process Group.
 
 You should see data flowing in NiFi and results appearing in your PostgreSQL database.
 
