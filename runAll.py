@@ -47,24 +47,73 @@ def start_services():
 
 def run_analytics():
     print("\n=== Starting Analytics & Producer ===")
-    print("Launching SparkAnalytics.py (Consumer)...")
-    # Open in new terminal if possible, else background
+    python_path = sys.executable
+    
+    print(f"Launching SparkAnalytics.py (Consumer) using spark-submit...")
+    # Open in new terminal and keep open
     try:
-        subprocess.Popen(["x-terminal-emulator", "-e", "python3 SparkAnalytics.py"])
+        # Use spark-submit for the Spark script
+        # We include the Kafka SQL package for Spark 3.5.x
+        spark_cmd = (
+            f"export PYSPARK_PYTHON={python_path} && "
+            f"export PYSPARK_DRIVER_PYTHON={python_path} && "
+            "spark-submit "
+            "--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.postgresql:postgresql:42.6.0 "
+            "SparkAnalytics.py"
+        )
+        cmd = f"bash -c '{spark_cmd}; exec bash'"
+        subprocess.Popen(["x-terminal-emulator", "-e", cmd])
     except FileNotFoundError:
         print("Could not open new terminal. Running in background.")
-        subprocess.Popen(["python3", "SparkAnalytics.py"])
+        subprocess.Popen(spark_cmd.split())
 
     time.sleep(5) # Give Spark a moment
 
-    print("Launching KafkaProducer.py (Producer)...")
+    print(f"Launching KafkaProducer.py (Producer) using {python_path}...")
     try:
-        subprocess.Popen(["x-terminal-emulator", "-e", "python3 KafkaProducer.py"])
+        # Quote the python path to handle spaces in directory names
+        cmd = f"bash -c '\"{python_path}\" KafkaProducer.py; exec bash'"
+        subprocess.Popen(["x-terminal-emulator", "-e", cmd])
     except FileNotFoundError:
         print("Could not open new terminal. Running in background.")
-        subprocess.Popen(["python3", "KafkaProducer.py"])
+        subprocess.Popen([python_path, "KafkaProducer.py"])
+
+def check_dependencies():
+    print("Checking dependencies...")
+    
+    # 1. Check PySpark (Don't auto-install, it's huge)
+    try:
+        import pyspark
+        print("✅ Found pyspark")
+    except ImportError:
+        print("⚠️  WARNING: 'pyspark' not found.")
+        print("   If you have it installed globally, ensure you are running with access to system packages.")
+        print("   Otherwise, install it manually: pip install pyspark")
+
+    # 2. Check other libs (Auto-install if missing and possible)
+    required_libs = {
+        "kafka": "kafka-python-ng",
+        "psycopg2": "psycopg2-binary",
+        "pandas": "pandas",
+        "dotenv": "python-dotenv"
+    }
+    
+    for module, package in required_libs.items():
+        try:
+            __import__(module)
+            print(f"✅ Found {package}")
+        except ImportError:
+            print(f"❌ Missing {package}. Attempting to install...")
+            try:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+                print(f"   Installed {package}")
+            except subprocess.CalledProcessError:
+                print(f"   FAILED to install {package}.")
+                print("   Hint: If you are on Kali Linux globally, try 'sudo apt install python3-xyz' or use a venv.")
 
 def main():
+    check_dependencies()
+
     start_services()
     
     print("\nWaiting 60 seconds for NiFi to initialize before running scripts...")

@@ -4,12 +4,16 @@ from pyspark.sql.functions import col, count, sum as Fsum, from_json, to_timesta
 from pyspark.sql.functions import avg, min, max, hour, month, year, when, collect_set, countDistinct
 from pyspark.sql.types import StructType, StructField, StringType, LongType, DoubleType, IntegerType, TimestampType
 
-# Environment variables (same)
-KAFKA_BOOTSTRAP = 'host.docker.internal:9092'
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Environment variables
+KAFKA_BOOTSTRAP = 'localhost:9092'
 INPUT_TOPIC = 'produceToSpark'
-POSTGRES_URL = 'jdbc:postgresql://localhost:5432/airplane_analytics'
-POSTGRES_USER = 'postgres'
-POSTGRES_PASSWORD = 'postgres'
+POSTGRES_URL = os.getenv('POSTGRES_URL', 'jdbc:postgresql://localhost:5432/airplane_analytics')
+POSTGRES_USER = os.getenv('POSTGRES_USER', 'postgres')
+POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD', 'postgres')
 
 print("Starting Spark Analytics...")
 print(f"Kafka: {KAFKA_BOOTSTRAP}")

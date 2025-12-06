@@ -21,6 +21,7 @@ producer = KafkaProducer(
     value_serializer=lambda v: json.dumps(v).encode("utf-8"),
     request_timeout_ms=30000,
     api_version_auto_timeout_ms=30000,
+    api_version=(2, 8, 1),
 )
 
 def read_csv_and_publish(path):

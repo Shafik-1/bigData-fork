@@ -1,5 +1,13 @@
+# Logs
 *.log
-.fuse_hidden*
+spark_debug.log
+.fuse*
+
+# Python
 __pycache__/
+*.pyc
+
+# Venv
 .venv/
-.env
+env/
+venv/
